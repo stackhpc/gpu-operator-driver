@@ -116,7 +116,11 @@ _install_prerequisites() (
     echo "kernel requires gcc version: 'gcc-${gcc_version}', current gcc version is '${current_gcc}'"
 
     if [[ "gcc-${gcc_version}" != "${current_gcc}"* ]]; then
-        dnf install -q -y "gcc-${gcc_version}"
+        dnf install -q -y "gcc-${gcc_version}" || {
+            gcc_arch=${KERNEL_RPM_ARCH}
+            gcc_release=1.${KERNEL_RPM_RELEASE##*.}
+            dnf install -y "${KOJI_BASE_URL}/packages/gcc/${gcc_version}/${gcc_release}/${gcc_arch}/"{cpp,libgomp,gcc}"-${gcc_version}-${gcc_release}.${gcc_arch}.rpm"
+        }
     fi
 )
 
